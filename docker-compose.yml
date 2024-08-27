@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  kellnr:
+    image: ghcr.io/kellnr/kellnr:$SOFTWARE_VERSION_TAG
+    restart: always
+    ports:
+      - "172.17.0.1:51957:8000"
+    environment:
+      KELLNR_SETUP__ADMIN_TOKEN: $KELLNR_SETUP__ADMIN_TOKEN
+      KELLNR_SETUP__ADMIN_PWD: $KELLNR_SETUP__ADMIN_PWD
+
+      KELLNR_ORIGIN__HOSTNAME: $KELLNR_ORIGIN__HOSTNAME
+      KELLNR_ORIGIN__PROTOCOL: https
+      KELLNR_ORIGIN__PORT: 443
+      KELLNR_PROXY__ENABLED: true
+      KELLNR_REGISTRY__AUTH_REQUIRED: false
+
+      KELLNR_POSTGRESQL__ENABLED: true
+      KELLNR_POSTGRESQL__ADDRESS: postgres
+      KELLNR_POSTGRESQL__PORT: 5432	
+      KELLNR_POSTGRESQL__DB: kellnr	
+      KELLNR_POSTGRESQL__USER: kellnr
+      KELLNR_POSTGRESQL__PWD: $ADMIN_PASSWORD
+    volumes:
+      - ./kellnr/kdata:/opt/kdata
+
+  postgres:
+    image: elestio/postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: kellnr
+      POSTGRES_DB: kellnr
+      POSTGRES_PASSWORD: $ADMIN_PASSWORD
+    ports:
+      - "172.17.0.1:11036:5432"
+    volumes:
+      - ./kellnr/pgdata:/var/lib/postgresql/data
+
+  pgadmin4:
+    image: elestio/pgadmin:latest
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${ADMIN_PASSWORD}
+      PGADMIN_LISTEN_PORT: 8080
+    ports:
+      - "172.17.0.1:41524:8080"
+    volumes:
+      - ./servers.json:/pgadmin4/servers.json
