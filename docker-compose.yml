@@ -38,7 +38,7 @@ services:
       - ./kellnr/pgdata:/var/lib/postgresql/data
 
   pgadmin4:
-    image: elestio/pgadmin:latest
+    image: dpage/pgadmin4:latest
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: ${ADMIN_EMAIL}
